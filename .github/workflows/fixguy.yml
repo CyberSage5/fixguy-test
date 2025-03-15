@@ -2,14 +2,14 @@ name: Run FixGuy
 
 on:
   schedule:
-    - cron: "0 0 * * 0"  # Weekly on Sunday
-  workflow_dispatch:  # Manual trigger for testing
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
 
 jobs:
   fixguy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: CyberSage5/fixguy@v1.0.0  # Replace 'username' with your GitHub username
+      - uses: username/fixguy@v1.0.1  # Updated to v1.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
