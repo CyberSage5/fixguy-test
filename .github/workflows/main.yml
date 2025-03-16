@@ -1,32 +1,32 @@
 name: Run FixGuy
 
-on:
-  schedule:
-    - cron: "0 0 * * 0"  # Weekly on Sunday
-  workflow_dispatch:  # Manual trigger
-  push:  # Run on push events
-  pull_request:  # Run on pull requests
+on: [push, pull_request]
 
 jobs:
-  fixguy:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      # Check out the user's repo (fixguy-test)
-      - name: Checkout user's repo
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
-      # Run FixGuy action (this will handle dependency installation)
-      - name: Run FixGuy action
-        uses: CyberSage5/fixguy@v1.0.6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Set up Python environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
 
-      # Fallback step to ensure PyGithub is installed if the action fails
-      - name: Fallback install PyGithub
-        run: |
-          echo "Ensuring PyGithub is installed..."
-          pip install PyGithub==2.3.0
+    - name: Install dependencies
+      run: |
+        if [ -f "fixguy-action/requirements.txt" ]; then
+          echo "requirements.txt found!"
+          cat fixguy-action/requirements.txt
+          pip install -r fixguy-action/requirements.txt
           echo "Installed packages:"
-          pip list | grep PyGithub
-        shell: bash
-        if: failure()  # Only run if the previous step fails
+          pip list | grep -E "PyGithub|flake8|GitPython"  # Check key packages
+        else
+          echo "Error: requirements.txt not found in fixguy-action/"
+          ls -la fixguy-action/  # Debug file listing
+          exit 1
+        fi
+
+    - name: Run your action
+      run: python fixguy-action/github/api.py
