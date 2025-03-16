@@ -1,30 +1,32 @@
 name: Run FixGuy
 
-on: [push, pull_request]
+on:
+  schedule:
+    - cron: "0 0 * * 0"  # Weekly on Sunday
+  workflow_dispatch:  # Manual trigger
+  push:  # Run on push events
+  pull_request:  # Run on pull requests
 
 jobs:
-  build:
+  fixguy:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      # Check out the user's repo (fixguy-test)
+      - name: Checkout user's repo
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
+      # Run FixGuy action
+      - name: Run FixGuy action
+        uses: CyberSage5/fixguy@v1.0.6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Install dependencies
-      run: |
-        if [ -f "fixguy-action/requirements.txt" ]; then
-          echo "requirements.txt found!"
-          pip install -r fixguy-action/requirements.txt
-        else
-          echo "Error: requirements.txt not found in fixguy-action/"
-          exit 1
-        fi
-
-    - name: Run FixGuy action
-      run: |
-        python fixguy-action/github/api.py
+      # Fallback step to ensure PyGithub is installed
+      - name: Fallback install PyGithub
+        run: |
+          echo "Ensuring PyGithub is installed..."
+          pip install PyGithub==2.3.0
+          echo "Installed packages:"
+          pip list | grep PyGithub
+        shell: bash
+        if: failure()  # Only run if the previous step fails
