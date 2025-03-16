@@ -15,13 +15,13 @@ jobs:
       - name: Checkout user's repo
         uses: actions/checkout@v4
 
-      # Run FixGuy action
+      # Run FixGuy action (this will handle dependency installation)
       - name: Run FixGuy action
         uses: CyberSage5/fixguy@v1.0.6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Fallback step to ensure PyGithub is installed
+      # Fallback step to ensure PyGithub is installed if the action fails
       - name: Fallback install PyGithub
         run: |
           echo "Ensuring PyGithub is installed..."
