@@ -26,7 +26,6 @@ jobs:
           echo "Error: requirements.txt not found in fixguy-action/"
           ls -la fixguy-action/  # Debug file listing
           exit 1
-        fi
 
     - name: Run your action
       run: python fixguy-action/github/api.py
