@@ -1,15 +1,30 @@
 name: Run FixGuy
 
-on:
-  schedule:
-    - cron: "0 0 * * 0"
-  workflow_dispatch:
+on: [push, pull_request]
 
 jobs:
-  fixguy:
+  build:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
-      - uses: CyberSage5/fixguy@v1.0.6  # Ensure it’s v1.0.6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        if [ -f "fixguy-action/requirements.txt" ]; then
+          echo "requirements.txt found!"
+          pip install -r fixguy-action/requirements.txt
+        else
+          echo "Error: requirements.txt not found in fixguy-action/"
+          exit 1
+        fi
+
+    - name: Run FixGuy action
+      run: |
+        python fixguy-action/github/api.py
