@@ -1,24 +1,20 @@
 name: Run FixGuy
-
 on: [push, pull_request]
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-    - name: Set up Python environment
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.x'
+        python-version: '3.8'
 
     - name: Install dependencies
       run: |
-        if [ -f "fixguy-action/requirements.txt" ]; then
-          echo "requirements.txt found!"
-          cat fixguy-action/requirements.txt
+        if [ -f fixguy-action/requirements.txt ]; then
           pip install -r fixguy-action/requirements.txt
           echo "Installed packages:"
           pip list | grep -E "PyGithub|flake8|GitPython"  # Check key packages
@@ -26,6 +22,4 @@ jobs:
           echo "Error: requirements.txt not found in fixguy-action/"
           ls -la fixguy-action/  # Debug file listing
           exit 1
-
-    - name: Run your action
-      run: python fixguy-action/github/api.py
+        fi
